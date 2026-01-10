@@ -1,75 +1,55 @@
-# Nuxt Minimal Starter
+# 奶茶了么 (Milktea Record)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+这是一个基于 Nuxt 3 + Nuxt UI + Prisma + Mysql 的全栈奶茶记录应用。
 
-## Setup
+## 功能特性
 
-Make sure to install dependencies:
+- 📅 **日历视图**：以日历形式直观展示每日奶茶记录，支持点击查看详情。
+- 📝 **记一杯**：快速记录奶茶订单，包含品牌、产品、价格、糖度、渠道等信息。
+- 🏷️ **品牌管理**：维护奶茶品牌库，支持上传 Logo。
+- 🔍 **订单查询**：支持按日期范围、品牌、产品名称筛选历史订单。
+- 📱 **移动端适配**：响应式设计，适配手机竖屏操作，底部导航栏。
+
+## 技术栈
+
+- **框架**: [Nuxt 3](https://nuxt.com/)
+- **UI 组件库**: [Nuxt UI](https://ui.nuxt.com/)
+- **数据库 ORM**: [Prisma](https://www.prisma.io/)
+- **数据库**: Mysql
+
+## 快速开始
+
+### 1. 安装依赖
 
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+### 2. 初始化数据库
 
 ```bash
-# npm
-npm run dev
+# 生成 Prisma Client
+npx prisma generate
 
-# pnpm
+# 推送数据库结构
+npx prisma db push
+```
+
+### 3. 启动开发服务器
+
+```bash
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+浏览器访问 http://localhost:3000
 
-Build the application for production:
+## 项目结构
 
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- `app/pages`: 页面路由
+  - `index.vue`: 首页（日历）
+  - `record.vue`: 记账页
+  - `brands.vue`: 品牌管理
+  - `search.vue`: 查询页
+- `app/layouts`: 布局文件
+- `server/api`: 后端 API 接口
+- `prisma/schema.prisma`: 数据库模型定义
