@@ -4,19 +4,31 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
   if (!id) {
-     throw createError({
+    throw createError({
       statusCode: 400,
-      statusMessage: 'ID is required',
+      statusMessage: 'Missing order ID',
     })
   }
 
+  // Check authentication
+  if (!event.context.userId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
+    })
+  }
+
+  // Verify the order belongs to the authenticated user
   const order = await prisma.order.findUnique({
-    where: {
-      id: parseInt(id),
-    },
-    include: {
-      brand: true,
-    },
+    where: { id: parseInt(id) },
   })
+
+  if (!order || order.userId !== event.context.userId) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Order not found or access denied',
+    })
+  }
+
   return order
 })

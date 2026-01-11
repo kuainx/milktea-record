@@ -1,7 +1,8 @@
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-    <header class="bg-white dark:bg-gray-800 shadow p-4 sticky top-0 z-50 flex justify-center items-center">
+    <header class="bg-white dark:bg-gray-800 shadow p-4 sticky top-0 z-50 flex justify-between items-center">
       <h1 class="text-xl font-bold text-primary-500">奶茶了么</h1>
+      <AuthButton />
     </header>
 
     <main class="flex-1 container mx-auto p-4 mb-20">

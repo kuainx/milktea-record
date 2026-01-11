@@ -4,7 +4,17 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const { date, startDate, endDate, brandId, productName } = query
 
-  const where: any = {}
+  // Check authentication
+  if (!event.context.userId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
+    })
+  }
+
+  const where: any = {
+    userId: event.context.userId, // Filter by authenticated user
+  }
 
   if (date) {
     const searchDate = new Date(String(date))

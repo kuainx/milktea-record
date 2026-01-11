@@ -46,9 +46,11 @@
         <div class="flex items-center gap-3">
           <UAvatar :src="getLogoUrl(order.brand.logo)" :alt="order.brand.name" />
           <div>
-            <div class="font-bold">{{ order.productName }}</div>
+            <div class="font-bold">{{ formatDate(order.date) }} | {{ order.brand.name }} | {{ order.productName }}</div>
             <div class="text-xs text-gray-500">
-              {{ formatDate(order.date) }} | {{ order.brand.name }} | {{ order.channel }}
+              {{ order.sugar }} | {{ order.temperature }}
+              <span v-if="order.toppings"> | {{ order.toppings }}</span>
+              <span v-if="order.channel"> | {{ order.channel }}</span>
             </div>
           </div>
         </div>

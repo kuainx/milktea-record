@@ -27,13 +27,22 @@
       <UFormField label="价格" name="price" required>
         <UInput type="number" v-model="form.price" step="0.1" placeholder="0.0" class="w-full" />
       </UFormField>
-      <UFormField label="糖度" name="sugar">
-        <USelect v-model="form.sugar" :items="sugarOptions" class="w-full" />
+      <UFormField label="渠道" name="channel">
+        <USelect v-model="form.channel" :items="channelOptions" class="w-full" />
       </UFormField>
     </div>
 
-    <UFormField label="渠道" name="channel">
-      <USelect v-model="form.channel" :items="channelOptions" class="w-full" />
+    <div class="grid grid-cols-2 gap-4">
+      <UFormField label="糖度" name="sugar">
+        <USelect v-model="form.sugar" :items="sugarOptions" class="w-full" />
+      </UFormField>
+      <UFormField label="温度" name="temperature">
+        <USelect v-model="form.temperature" :items="temperatureOptions" class="w-full" />
+      </UFormField>
+    </div>
+
+    <UFormField label="小料" name="toppings">
+      <UInput v-model="form.toppings" placeholder="例如：加珍珠、少珍珠" class="w-full" />
     </UFormField>
 
     <div class="flex gap-2 mt-6">
@@ -72,6 +81,7 @@
   const toast = useToast();
 
   const sugarOptions = ['标准糖', '半糖', '少糖', '微糖', '无糖'];
+  const temperatureOptions = ['热', '常温', '少冰', '正常冰', '冰沙'];
   const channelOptions = ['饿了么', '美团', '小程序', '线下', '京东', '其他'];
 
   const form = reactive({
@@ -79,6 +89,8 @@
     productName: props.initialOrder?.productName || '',
     price: props.initialOrder?.price || '',
     sugar: props.initialOrder?.sugar || '无糖',
+    temperature: props.initialOrder?.temperature || '正常冰',
+    toppings: props.initialOrder?.toppings || '',
     channel: props.initialOrder?.channel || '',
   });
 

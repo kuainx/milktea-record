@@ -11,6 +11,15 @@ datasource db {
   provider = "mysql"
 }
 
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Brand {
   id        Int      @id @default(autoincrement())
   name      String
@@ -25,8 +34,12 @@ model Order {
   date        DateTime
   brandId     Int
   brand       Brand    @relation(fields: [brandId], references: [id])
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
   productName String
   sugar       String
+  temperature String   @default("正常冰")
+  toppings    String?
   price       Float
   channel     String
   createdAt   DateTime @default(now())

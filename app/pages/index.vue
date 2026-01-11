@@ -54,9 +54,11 @@
             <div class="flex items-center gap-3">
               <UAvatar :src="getLogoUrl(order.brand.logo)" :alt="order.brand.name" />
               <div>
-                <div class="font-bold">{{ order.productName }}</div>
+                <div class="font-bold">{{ order.brand.name }} | {{ order.productName }}</div>
                 <div class="text-xs text-gray-500">
-                  {{ order.brand.name }} | {{ order.sugar }} | {{ order.channel }}
+                  {{ order.sugar }} | {{ order.temperature }}
+                  <span v-if="order.toppings"> | {{ order.toppings }}</span>
+                  <span v-if="order.channel"> | {{ order.channel }}</span>
                 </div>
               </div>
             </div>
@@ -70,8 +72,7 @@
           <div class="text-sm text-gray-500" v-if="selectedDayOrders.length > 0">
             共 {{ selectedDayOrders.length }} 杯，合计 ¥{{ selectedDayTotal }}
           </div>
-          <div v-else></div>
-          <UButton color="neutral" variant="subtle" @click="isModalOpen = false">关闭</UButton>
+          <div v-else>什么都没有</div>
         </div>
       </template>
     </UModal>
