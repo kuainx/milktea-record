@@ -49,8 +49,10 @@
             <div class="font-bold">{{ formatDate(order.date) }} | {{ order.brand.name }} | {{ order.productName }}</div>
             <div class="text-xs text-gray-500">
               {{ order.sugar }} | {{ order.temperature }}
-              <span v-if="order.toppings"> | {{ order.toppings }}</span>
+              <span v-if="order.toppings && order.toppings !== '无'"> | {{ order.toppings }}</span>
               <span v-if="order.channel"> | {{ order.channel }}</span>
+              <span v-if="order.evaluation"> | <span class="text-xs text-gray-400 mt-1 italic">“{{ order.evaluation }}”</span>
+              </span>
             </div>
           </div>
         </div>

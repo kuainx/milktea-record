@@ -12,10 +12,7 @@ export default defineEventHandler(async (event) => {
 
   // Check authentication
   if (!event.context.userId) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-    })
+    throwUnauthorized(event)
   }
 
   // Verify the order belongs to the authenticated user

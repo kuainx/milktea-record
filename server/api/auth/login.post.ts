@@ -18,18 +18,12 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Invalid username or password',
-    })
+    throwUnauthorized(event, 'Invalid username or password')
   }
 
   // Verify password
   if (password !== user.password) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Invalid username or password',
-    })
+    throwUnauthorized(event, 'Invalid username or password')
   }
 
   // Generate token

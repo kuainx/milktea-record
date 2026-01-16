@@ -7,17 +7,31 @@
     <UFormField label="品牌" name="brandId" required>
       <USelectMenu
         v-model="selectedBrand"
+        v-model:search-query="searchQuery"
         :items="brandsList"
         placeholder="选择品牌"
         :search-input="{
           placeholder: '搜索品牌',
           icon: 'i-heroicons-magnifying-glass',
+          onKeydown: handleSearchKeydown,
         }"
         :avatar="selectedBrand?.avatar"
         class="w-full"
       >
       </USelectMenu>
     </UFormField>
+
+    <UModal v-model:open="showConfirmModal" title="添加品牌">
+      <template #body>
+        <div class="p-4">
+          <p>品牌 "{{ searchQuery }}" 不存在，是否添加该品牌？</p>
+          <div class="flex justify-end gap-2 mt-4">
+            <UButton color="neutral" variant="subtle" @click="showConfirmModal = false">取消</UButton>
+            <UButton color="primary" @click="confirmAddBrand">确认</UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
 
     <UFormField label="产品名称" name="productName" required>
       <UInput v-model="form.productName" placeholder="例如：多肉葡萄" class="w-full" />
@@ -42,7 +56,11 @@
     </div>
 
     <UFormField label="小料" name="toppings">
-      <UInput v-model="form.toppings" placeholder="例如：加珍珠、少珍珠" class="w-full" />
+      <UInput v-model="form.toppings" placeholder="珍珠" class="w-full" />
+    </UFormField>
+
+    <UFormField label="评价" name="evaluation">
+      <UTextarea v-model="form.evaluation" placeholder="说说这杯奶茶怎么样..." class="w-full" :rows="3" />
     </UFormField>
 
     <div class="flex gap-2 mt-6">
@@ -70,28 +88,73 @@
 
   const emit = defineEmits(['success', 'cancel']);
 
-  const brandsList = await getBrandData();
+  const brandsList = ref([]);
+  const searchQuery = ref('');
+  const showConfirmModal = ref(false);
+
   onMounted(async () => {
     brandsList.value = await getBrandData();
     if (props.initialOrder) {
-      selectedBrand.value = brandsList.value.find((b) => b.value === props.initialOrder.brandId);
+      selectedBrand.value = brandsList.value.find(b => b.value === props.initialOrder.brandId);
     }
   });
 
   const toast = useToast();
 
-  const sugarOptions = ['标准糖', '半糖', '少糖', '微糖', '无糖'];
-  const temperatureOptions = ['热', '常温', '少冰', '正常冰', '冰沙'];
-  const channelOptions = ['饿了么', '美团', '小程序', '线下', '京东', '其他'];
+  function handleSearchKeydown(event) {
+    if (event.key === 'Enter') {
+      const value = event.target.value;
+      if (!value) return;
+      searchQuery.value = value;
+      const hasMatches = brandsList.value.some(b => b.label.toLowerCase().includes(value.toLowerCase()));
+      if (!hasMatches) {
+        setTimeout(() => (showConfirmModal.value = true), 50);
+      }
+    }
+  }
+
+  async function confirmAddBrand() {
+    if (!searchQuery.value) return;
+
+    try {
+      const newBrand = await $fetch('/api/brands', {
+        method: 'POST',
+        body: {
+          name: searchQuery.value,
+          logo: searchQuery.value,
+        },
+      });
+
+      // 刷新品牌列表
+      brandsList.value = await getBrandData();
+
+      // 找到并选择新品牌
+      const newlyCreated = brandsList.value.find(b => b.value === newBrand.id);
+      if (newlyCreated) {
+        selectedBrand.value = newlyCreated;
+      }
+
+      showConfirmModal.value = false;
+      searchQuery.value = '';
+      toast.add({ title: 'Success', description: '品牌添加成功' });
+    } catch (e) {
+      toast.add({ title: 'Error', description: '添加品牌失败', color: 'red' });
+    }
+  }
+
+  const sugarOptions = ['默认', '标准糖', '半糖', '少糖', '微糖', '不加糖'];
+  const temperatureOptions = ['默认', '热', '常温', '少冰', '正常冰', '冰沙'];
+  const channelOptions = ['淘宝闪购', '美团', '小程序', '线下', '京东', '其他'];
 
   const form = reactive({
     date: props.initialOrder ? formatLocalDate(props.initialOrder.date) : formatLocalDate(),
     productName: props.initialOrder?.productName || '',
     price: props.initialOrder?.price || '',
-    sugar: props.initialOrder?.sugar || '无糖',
-    temperature: props.initialOrder?.temperature || '正常冰',
-    toppings: props.initialOrder?.toppings || '',
-    channel: props.initialOrder?.channel || '',
+    sugar: props.initialOrder?.sugar || '不加糖',
+    temperature: props.initialOrder?.temperature || '默认',
+    toppings: props.initialOrder?.toppings || '无',
+    channel: props.initialOrder?.channel || '淘宝闪购',
+    evaluation: props.initialOrder?.evaluation || '',
   });
 
   const selectedBrand = ref(null);

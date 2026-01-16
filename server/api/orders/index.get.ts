@@ -6,10 +6,7 @@ export default defineEventHandler(async (event) => {
 
   // Check authentication
   if (!event.context.userId) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-    })
+    throwUnauthorized(event)
   }
 
   const where: any = {

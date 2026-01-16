@@ -10,6 +10,10 @@
           <UInput v-model="form.password" type="password" placeholder="请输入密码" class="w-full" />
         </UFormField>
 
+        <div class="flex items-center">
+          <UCheckbox v-model="form.remember" label="记住我" />
+        </div>
+
         <div class="flex gap-2 mt-6">
           <UButton color="neutral" variant="subtle" @click="showRegister = true">注册</UButton>
           <UButton type="submit" block :loading="loading" class="flex-1">登录</UButton>
@@ -65,6 +69,19 @@
     if (authToken.value) {
       isOpen.value = false;
     }
+
+    // Load remembered user
+    const savedUser = localStorage.getItem('remembered_user');
+    if (savedUser) {
+      try {
+        const { username, password } = JSON.parse(savedUser);
+        form.username = username;
+        form.password = password;
+        form.remember = true;
+      } catch (e) {
+        console.error('Failed to load remembered user', e);
+      }
+    }
   });
 
   const showRegister = ref(false);
@@ -74,6 +91,7 @@
   const form = reactive({
     username: '',
     password: '',
+    remember: false,
   });
 
   const registerForm = reactive({
@@ -105,9 +123,21 @@
       emit('login-success');
       isOpen.value = false;
 
-      // Reset form
-      form.username = '';
-      form.password = '';
+      // Handle remember me
+      if (form.remember) {
+        localStorage.setItem('remembered_user', JSON.stringify({
+          username: form.username,
+          password: form.password
+        }));
+      } else {
+        localStorage.removeItem('remembered_user');
+      }
+
+      // Reset form (keep username/password if remembered, or reset if not)
+      if (!form.remember) {
+        form.username = '';
+        form.password = '';
+      }
     } catch (e) {
       useToast().add({ title: '错误', description: e.message || '登录失败', color: 'red' });
     } finally {

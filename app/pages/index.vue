@@ -49,7 +49,13 @@
           <div
             v-for="order in selectedDayOrders"
             :key="order.id"
-            class="flex items-center justify-between p-2 border dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-800/50"
+            class="flex items-center justify-between p-2 border dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-800/50 cursor-pointer select-none active:bg-gray-100 dark:active:bg-gray-700 transition-colors"
+            @mousedown="startPress(order)"
+            @mouseup="cancelPress"
+            @mouseleave="cancelPress"
+            @touchstart="startPress(order)"
+            @touchend="cancelPress"
+            @contextmenu.prevent
           >
             <div class="flex items-center gap-3">
               <UAvatar :src="getLogoUrl(order.brand.logo)" :alt="order.brand.name" />
@@ -57,8 +63,9 @@
                 <div class="font-bold">{{ order.brand.name }} | {{ order.productName }}</div>
                 <div class="text-xs text-gray-500">
                   {{ order.sugar }} | {{ order.temperature }}
-                  <span v-if="order.toppings"> | {{ order.toppings }}</span>
+                  <span v-if="order.toppings && order.toppings !== '无'"> | {{ order.toppings }}</span>
                   <span v-if="order.channel"> | {{ order.channel }}</span>
+                  <span v-if="order.evaluation"> | <span class="text-xs text-gray-400 mt-1 italic">“{{ order.evaluation }}”</span></span>
                 </div>
               </div>
             </div>
@@ -74,6 +81,19 @@
           </div>
           <div v-else>什么都没有</div>
         </div>
+      </template>
+    </UModal>
+
+    <!-- Edit Modal -->
+    <UModal v-model:open="isEditModalOpen" title="修改订单">
+      <template #body>
+        <OrderForm
+          v-if="editingOrder"
+          :initial-order="editingOrder"
+          is-modal
+          @success="onEditSuccess"
+          @cancel="isEditModalOpen = false"
+        />
       </template>
     </UModal>
   </div>
@@ -137,5 +157,33 @@
   function openDayDetails(day) {
     selectedDay.value = day;
     isModalOpen.value = true;
+  }
+
+  const isEditModalOpen = ref(false);
+  const editingOrder = ref(null);
+  let pressTimer = null;
+
+  function startPress(order) {
+    cancelPress();
+    pressTimer = setTimeout(() => {
+      editOrder(order);
+    }, 600); // 600ms long press
+  }
+
+  function cancelPress() {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+  }
+
+  function editOrder(order) {
+    editingOrder.value = order;
+    isEditModalOpen.value = true;
+  }
+
+  async function onEditSuccess() {
+    isEditModalOpen.value = false;
+    await refresh();
   }
 </script>

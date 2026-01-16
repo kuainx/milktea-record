@@ -2,7 +2,7 @@ import prisma from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { date, brandId, productName, sugar, temperature, toppings, price, channel } = body
+  const { date, brandId, productName, sugar, temperature, toppings, price, channel, evaluation } = body
 
   if (!date || !brandId || !productName || !price) {
     throw createError({
@@ -13,10 +13,7 @@ export default defineEventHandler(async (event) => {
 
   // Check authentication
   if (!event.context.userId) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-    })
+    throwUnauthorized(event)
   }
 
   const order = await prisma.order.create({
@@ -30,6 +27,7 @@ export default defineEventHandler(async (event) => {
       toppings,
       price: parseFloat(price),
       channel: channel || '小程序',
+      evaluation,
     },
   })
   return order

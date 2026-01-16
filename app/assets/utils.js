@@ -11,8 +11,8 @@ export function formatLocalDate(date = new Date()) {
 }
 
 export async function getBrandData(){
-  const { data: brands } = await useFetch('/api/brands');
-  const brandsList = brands.value?.map(brand => ({
+  const brands = await $fetch('/api/brands');
+  const brandsList = brands?.map(brand => ({
     value: brand.id,
     label: brand.name,
     avatar: {
